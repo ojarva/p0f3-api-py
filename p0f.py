@@ -104,6 +104,8 @@ class P0f:
                P0fException for invalid queries
                KeyError if no data is available
                socket.error if socket is disconnected
+               ValueError if invalid constant value is
+                          returned.
 
             Returns dictionary matching to fields defined in
                 http://lcamtuf.coredump.cx/p0f3/README

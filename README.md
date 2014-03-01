@@ -19,7 +19,10 @@ except P0fException, e:
     print e
 except KeyError, e:
     # No data is available for this IP address.
-    pass
+    print e
+except ValueError, e:
+    # p0f returned invalid constant values. Maybe the API has changed?
+    print e
 
 if data:
     print "First seen:", data["first_seen"]
