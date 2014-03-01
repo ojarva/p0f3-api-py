@@ -80,15 +80,17 @@ class P0f:
                        1: BAD_SW_OS_MISMATCH,
                        2: BAD_SW_MISMATCH}
 
-    def __init__(self, socket_path):
+    def __init__(self, socket_path, **kwargs):
         self.socket_path = socket_path
         self._client = None
+        self.timeout = kwargs.get("timeout", 0.1)
 
     @property
     def client(self):
         """ Returns (cached) socket connection to p0f """
         if not self._client:
             self._client = socket.socket(socket.AF_UNIX)
+            self._client.settimeout(self.timeout)
             self._client.connect(self.socket_path)
         return self._client
 
