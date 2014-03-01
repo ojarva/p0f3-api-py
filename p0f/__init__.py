@@ -136,9 +136,9 @@ class P0f:
             raise P0fException("Server returned invalid magic number")
 
         status = self.RESPONSE_STATUS[data_in["status"]]
-        if status == "Bad query":
+        if status == self.RESPONSE_BAD_QUERY:
             raise P0fException("Improperly formatted query sent to p0f")
-        elif status == "No match":
+        elif status == self.RESPONSE_NO_MATCH:
             raise KeyError("No data available in p0f for %s" % ip_address)
         if return_raw_data:
             return data_in
@@ -159,8 +159,10 @@ class P0f:
         if data_in["uptime_min"] == 0:
             data_in["uptime"] = None
             data_in["uptime_min"] = None
+            data_in["uptime_sec"] = None
         else:
-            data_in["uptime"] = data_in["uptime_min"] * 60
+            data_in["uptime_sec"] = data_in["uptime_min"] * 60
+            data_in["uptime"] = datetime.timedelta(seconds=data_in["uptime_sec"])
 
         if data_in["os_match_q"] not in cls.RESPONSE_OS_MATCH:
             raise ValueError("p0f provided invalid value for os_match_q: %s"

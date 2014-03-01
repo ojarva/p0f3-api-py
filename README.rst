@@ -40,7 +40,8 @@ By default, following fields are parsed:
 
 - datetime: **first_seen**
 - datetime: **last_seen**
-- int: **uptime** - uptime in seconds
+- timedelta: **uptime**
+- int: **uptime_sec**
 - timedelta: **up_mod_days**
 - datetime: **last_nat**
 - datetime: **last_chg**
@@ -50,6 +51,7 @@ is raised, if incorrect value is encountered. For all empty fields,
 None is used instead of empty strings or constants:
 
 - **uptime_min**
+- **uptime_sec**
 - **uptime**
 - **up_mod_days**
 - **last_nat**

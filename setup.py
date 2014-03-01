@@ -10,7 +10,7 @@ def read(fname):
 
 setup(
     name = "p0f",
-    version = "0.0.1",
+    version = "0.0.2",
     author = "Olli Jarva",
     author_email = "olli@jarva.fi",
     description = ("API client for p0f3"),
