@@ -29,7 +29,42 @@ if data:
 Data fields
 -----------
 
-These are shamelessly copied from [here](http://lcamtuf.coredump.cx/p0f3/README):
+Parts of these descriptions are shamelessly copied from 
+[here](http://lcamtuf.coredump.cx/p0f3/README):
+
+By default, following fields are parsed:
+
+- datetime: **first_seen**
+- datetime: **last_seen**
+- int: **uptime** - uptime in seconds
+- timedelta: **up_mod_days**
+- datetime: **last_nat**
+- datetime: **last_chg**
+
+Additionally, **bad_sw** and **os_match_q** are validated. ```ValueError```
+is raised, if incorrect value is encountered. For all empty fields,
+None is used instead of empty strings or constants:
+
+- **uptime_min**
+- **uptime**
+- **up_mod_days**
+- **last_nat**
+- **last_chg**
+- **distance**
+- **bad_sw**
+- **os_name**
+- **os_flavor**
+- **http_flavor**
+- **link_type**
+- **language**
+
+This parsing and validation can be disabled with
+
+```python
+p0f.get_info("192.168.0.1", True)
+```
+
+Full descriptions of the fields:
 
 - int: **first_seen** - unix time (seconds) of first observation of the host.
 - int: **last_seen**  - unix time (seconds) of most recent traffic.
@@ -49,8 +84,8 @@ These are shamelessly copied from [here](http://lcamtuf.coredump.cx/p0f3/README)
 - int: **os_match_q** - OS match quality: 0 for a normal match; 1 for fuzzy
                         (e.g., TTL or DF difference); 2 for a generic signature;
                         and 3 for both.
-- string: **os_name** - NUL-terminated name of the most recent positively matched
-                        OS. If OS not known, os_name[0] is NUL.
+- string: **os_name** - Name of the most recent positively matched
+                        OS. If OS not known, os_name is empty string.
                         NOTE: If the host is first seen using an known system and
                         then switches to an unknown one, this field is not
                         reset.

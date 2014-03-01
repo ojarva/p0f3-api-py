@@ -25,6 +25,7 @@ THE SOFTWARE.
 
 import struct
 import socket
+import datetime
 
 class P0f:
     """ This class is used to query data from p0f3, available from
@@ -48,7 +49,36 @@ class P0f:
              "last_chg", "distance", "bad_sw", "os_match_q", "os_name",
              "os_flavor", "http_name", "http_flavor", "link_type", "language"]
     RESPONSE_FMT = "IbIIIIIIIhbb32s32s32s32s32s32s"
-    RESPONSE_STATUS = {32: "No match", 0: "Bad query", 16: "OK"}
+
+    RESPONSE_NO_MATCH = 32
+    RESPONSE_OK = 16
+    RESPONSE_BAD_QUERY = 0
+
+    RESPONSE_STATUS = {32: RESPONSE_NO_MATCH,
+                       16: RESPONSE_OK,
+                        0: RESPONSE_BAD_QUERY}
+
+    RESPONSE_DATETIME_PARSE = ["first_seen", "last_seen", "last_nat", 
+                               "last_chg"]
+
+
+    OS_MATCH_NORMAL = 0
+    OS_MATCH_FUZZY = 1
+    OS_MATCH_GENERIC = 2
+    OS_MATCH_BOTH = 3
+
+    RESPONSE_OS_MATCH = {0: OS_MATCH_NORMAL,
+                         1: OS_MATCH_FUZZY,
+                         2: OS_MATCH_GENERIC,
+                         3: OS_MATCH_BOTH}
+
+    BAD_SW_NA = 0
+    BAD_SW_OS_MISMATCH = 1
+    BAD_SW_MISMATCH = 2
+
+    RESPONSE_BAD_SW = {0: BAD_SW_NA,
+                       1: BAD_SW_OS_MISMATCH,
+                       2: BAD_SW_MISMATCH}
 
     def __init__(self, socket_path):
         self.socket_path = socket_path
@@ -68,7 +98,7 @@ class P0f:
             return
         self._client.close()
 
-    def get_info(self, ip_address):
+    def get_info(self, ip_address, return_raw_data=False):
         """ Returns information retrieved from p0f.
             Raises
                P0fException for invalid queries
@@ -93,22 +123,72 @@ class P0f:
 
         data_in = {}
         for i in range(len(values)):
-            s = values[i]
-            if isinstance(s, str):
-                s = s.replace("\x00", "")
-            data_in[self.RESPONSE_FIELDS[i]] = s
+            value = values[i]
+            if isinstance(value, str):
+                value = value.replace("\x00", "")
+            data_in[self.RESPONSE_FIELDS[i]] = value
+
+        if data_in["magic"] != 0x50304602:
+            raise P0fException("Server returned invalid magic number")
 
         status = self.RESPONSE_STATUS[data_in["status"]]
         if status == "Bad query":
             raise P0fException("Improperly formatted query sent to p0f")
         elif status == "No match":
             raise KeyError("No data available in p0f for %s" % ip_address)
+        if return_raw_data:
+            return data_in
+
+        return P0f.format_data(data_in)
+
+    @classmethod
+    def format_data(cls, data_in):
+        """ Parses p0f response to datetime, validates constants and
+            replaces empty values with None """
+        for field in cls.RESPONSE_DATETIME_PARSE:
+            if data_in[field] == 0:
+                data_in[field] = None
+                continue
+            data_in[field] = datetime.datetime.fromtimestamp(data_in[field])
+        data_in["up_mod_days"] = datetime.timedelta(days=data_in["up_mod_days"])
+
+        if data_in["uptime_min"] == 0:
+            data_in["uptime"] = None
+            data_in["uptime_min"] = None
+        else:
+            data_in["uptime"] = data_in["uptime_min"] * 60
+
+        if data_in["os_match_q"] not in cls.RESPONSE_OS_MATCH:
+            raise ValueError("p0f provided invalid value for os_match_q: %s"
+                               % data_in["os_match_q"])
+        if data_in["bad_sw"] not in cls.RESPONSE_BAD_SW:
+            raise ValueError("p0f responded with invalid bad_sw: %s"
+                               % data_in["bad_sw"])
+
+        if data_in["distance"] == -1:
+            data_in["distance"] = None
+        
+        for field in ("up_mod_days", "last_nat", "last_chg", "bad_sw"):
+            if data_in[field] == 0:
+                data_in[field] = None
+
+        for field in ("os_name", "os_flavor", "http_flavor", "link_type",
+                      "language"):
+            if len(data_in[field]) == 0:
+                data_in[field] = None
+
         return data_in
 
 class P0fException(Exception):
+    """ Raised when server returns invalid data """
     pass
+
+def main():
+    """ This is a testing method, executed when
+        this file is executed instead of imported. """
+    p0f_client = P0f("p0f.sock")
+    print p0f_client.get_info("10.1.0.2")
 
 
 if __name__ == '__main__':
-    p0f = P0f("p0f.sock")
-    p0f.get_info("10.1.7.2")
+    main()
