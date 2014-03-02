@@ -39,9 +39,12 @@ class P0fRecord(models.Model):
         get_latest_by = "last_seen"
 
     def __unicode__(self):
+        return u"%s: %s @ %s" % (self.remote_ip, self.os_name, self.first_seen)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    remote_ip = models.GenericIPAddressField()
 
     first_seen = models.DateTimeField(help_text="First observation of the host")
     last_seen = models.DateTimeField(help_text="Most recent observation of the host")
