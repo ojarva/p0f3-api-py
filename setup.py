@@ -10,13 +10,13 @@ def read(fname):
 
 setup(
     name = "p0f",
-    version = "0.0.2",
+    version = "0.1.0",
     author = "Olli Jarva",
     author_email = "olli@jarva.fi",
     description = ("API client for p0f3"),
     license = "MIT",
     keywords = "p0f fingerprinting API client",
-    url = "http://packages.python.org/p0f",
+    url = "https://github.com/ojarva/p0f3-api-py",
     packages=['p0f'],
     long_description=read('README.rst'),
     download_url = "https://github.com/ojarva/p0f3-api-py",
