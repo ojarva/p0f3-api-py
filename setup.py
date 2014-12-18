@@ -22,7 +22,7 @@ setup(
     download_url = "https://github.com/ojarva/p0f3-api-py",
     bugtracker_url = "https://github.com/ojarva/p0f3-api-py/issues",
     classifiers=[
-        "Development Status :: 5",
+        "Development Status :: 5 - Production/Stable",
         "Topic :: Software Development :: Libraries",
         "Topic :: System :: Networking :: Monitoring",
         "License :: OSI Approved :: MIT License",
