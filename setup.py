@@ -10,7 +10,7 @@ def read(fname):
 
 setup(
     name = "p0f",
-    version = "0.1.0",
+    version = "1.0.0",
     author = "Olli Jarva",
     author_email = "olli@jarva.fi",
     description = ("API client for p0f3"),
@@ -22,8 +22,9 @@ setup(
     download_url = "https://github.com/ojarva/p0f3-api-py",
     bugtracker_url = "https://github.com/ojarva/p0f3-api-py/issues",
     classifiers=[
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 5",
         "Topic :: Software Development :: Libraries",
+        "Topic :: System :: Networking :: Monitoring",
         "License :: OSI Approved :: MIT License",
     ],
 )

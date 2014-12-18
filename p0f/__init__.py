@@ -193,7 +193,7 @@ def main():
     """ This is a testing method, executed when
         this file is executed instead of imported. """
     p0f_client = P0f("p0f.sock")
-    print p0f_client.get_info("10.1.0.2")
+    print(p0f_client.get_info("10.1.0.2"))
 
 
 if __name__ == '__main__':
