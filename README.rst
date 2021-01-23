@@ -101,3 +101,8 @@ Full descriptions of the fields:
 - string: **http_flavor** - version of the HTTP application, if any.
 - string: **link_type**   - network link type, if recognized.
 - string: **language**    - system language, if recognized.
+
+License
+-------
+
+See LICENSE.txt
