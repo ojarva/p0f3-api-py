@@ -29,12 +29,12 @@ class P0fMiddleware:
         try:
             enabled = settings.P0FENABLED
             if not enabled:
-                return MiddlewareNotUsed
+                raise MiddlewareNotUsed
         except AttributeError:
             pass
 
         try:
-            socket = settings.P0FSOCKET
+            settings.P0FSOCKET
         except AttributeError:
             log.error("P0FSOCKET is not configured.")
             raise ImproperlyConfigured("P0FSOCKET is not configured. This middleware does not run without path to p0f unix socket")
@@ -44,11 +44,11 @@ class P0fMiddleware:
         try:
             p0fapi = p0f.P0f(settings.P0FSOCKET)
             remote_info = p0fapi.get_info(request.META.get("REMOTE_ADDR"))
-        except socket.error, e:
-            log.error("p0f API call returned %s", str(e))
-        except KeyError, e:
+        except socket.error as e:
+            log.error("p0f API call returned %r", e)
+        except KeyError as e:
             log.warn("No data available for %s - is p0f listening the right interface?", request.META.get("REMOTE_ADDR"))
-        except (ValueError, p0f.P0fException), e:
-            log.warn("internal error: %s", str(e))
+        except (ValueError, p0f.P0fException) as e:
+            log.warn("internal error: %r", e)
 
         request.p0f = remote_info
