@@ -117,7 +117,7 @@ class P0f:
         values = struct.unpack(self.RESPONSE_FMT, data_received)
 
         data_in = {}
-        for i in range(len(values)):
+        for i, value in enumerate(values):
             value = values[i]
             if isinstance(value, str):
                 value = value.replace("\x00", "")
@@ -129,7 +129,7 @@ class P0f:
         status = self.RESPONSE_STATUS[data_in["status"]]
         if status == self.RESPONSE_BAD_QUERY:
             raise P0fException("Improperly formatted query sent to p0f")
-        elif status == self.RESPONSE_NO_MATCH:
+        if status == self.RESPONSE_NO_MATCH:
             raise KeyError("No data available in p0f for %s" % ip_address)
         if return_raw_data:
             return data_in
@@ -176,7 +176,6 @@ class P0f:
 
 class P0fException(Exception):
     """ Raised when server returns invalid data """
-    pass
 
 
 def main():

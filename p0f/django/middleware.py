@@ -25,7 +25,7 @@ import p0f
 log = logging.getLogger(__name__)
 
 
-class P0fMiddleware:
+class P0fMiddleware:  # pylint: disable=too-few-public-methods
     """ Adds "p0f" attribute to request. Requires P0FSOCKET setting in Django settings.py """
     def __init__(self):
         try:
@@ -37,11 +37,11 @@ class P0fMiddleware:
 
         try:
             settings.P0FSOCKET
-        except AttributeError:
+        except AttributeError as ex:
             log.error("P0FSOCKET is not configured.")
             raise ImproperlyConfigured(
                 "P0FSOCKET is not configured. This middleware does not run without path to p0f unix socket"
-            )
+            ) from ex
 
     def process_request(self, request):
         remote_info = None
@@ -51,8 +51,8 @@ class P0fMiddleware:
         except socket.error as e:
             log.error("p0f API call returned %r", e)
         except KeyError as e:
-            log.warn("No data available for %s - is p0f listening the right interface?", request.META.get("REMOTE_ADDR"))
+            log.warning("No data available for %s - is p0f listening the right interface?", request.META.get("REMOTE_ADDR"))
         except (ValueError, p0f.P0fException) as e:
-            log.warn("internal error: %r", e)
+            log.warning("internal error: %r", e)
 
         request.p0f = remote_info
